@@ -6,7 +6,7 @@
 
 * Designed and implemented as *LiveScript* over 10 days in 1995 by Brendan Eich at Netscape
 * Mixture of ideas from Scheme and Self, with surface syntax borrowed from Java
-* Later renamed to *JavaScript* (tm) for marketing purposes
+* Later renamed to *JavaScript*&trade; for marketing purposes
 * Standardized as *EcmaScript* in 1997
 * Long version gap between 2005 and 2015
   * Time for browser implementers to catch up
@@ -17,7 +17,7 @@
 ## Platforms
 
 * Browser
-  * Trinity HTML, CSS and JS
+  * Trinity: HTML, CSS and JS
   * Form validation
   * DOM manipulation
   * Full-blown client applications
@@ -29,18 +29,19 @@
 
 * Dynamically typed
 * Primitives
-  * Undefined
-  * Null
-  * Boolean
-  * Number
-  * String
+  * `undefined`
+  * `null`
+  * `boolean`
+  * `number`
+  * `string`
 * Objects
 
 ### Undefined
 
 * A singleton type consisting of the `undefined` value
 * `undefined` is the value of:
-  * uninitialized variables, and
+  * uninitialized variables
+  * function calls without `return`
   * missing object properties
 
 ### Null
@@ -55,10 +56,9 @@
 
 ### Number
 
-* The only numeric type in JavaScript
 * Implemented as IEEE754 double precision
-  * `0.1 + 0.2 !== 0.3`
-  * Integers up to 9*10^15 (9 quadrillion === 9 Billiarden) can be represented exactly
+  * `0.1 + 0.2 == 0.30000000000000004`
+  * Integers up to `9007199254740992` (9 quadrillion, 9 Billiarden) can be represented exactly
 
 ### String
 
@@ -67,6 +67,7 @@
 * `'world'`
 * JavaScript has no character type
   * `s[i]` yields string of length 1
+  * `s.length` is not a method
 
 ## Variables
 
@@ -94,27 +95,9 @@ https://stackoverflow.com/a/23465314
 * Yet calling methods on primitive values appears to be possible
 * Behind the scenes, a coercion from primitive value to primitive object takes place
 * This conversion can be requested manually as well:
-  * `false` vs. `new Number(false)`
+  * `false` vs. `new Boolean(false)`
   * `42` vs. `new Number(42)`
-  * `"hello"` vs. `new String("hello")`
-
-## Control flow
-
-```js
-if (condition) {
-    // ...
-} else {
-    // ...
-}
-
-while (condition) {
-    // ...
-}
-
-do {
-    // ...
-} while (condition);
-```
+  * `'hello'` vs. `new String('hello')`
 
 ## Falsy values
 
@@ -122,11 +105,55 @@ The following values are treated as false in conditions:
 * `null`
 * `undefined`
 * `false`
-* `0.0`
+* `+0.0`
+* `-0.0`
 * `NaN`
-* `""`
+* `''`
 
 Note: Primitive objects such as `new Boolean(false)` are truthy!
+
+## Control flow
+
+```js
+let coin;
+if (Math.random() < 0.5) {
+    coin = 'heads';
+} else {
+    coin = 'tails';
+}
+
+const coin = Math.random() < 0.5 ? 'heads' : 'tails';
+
+switch (expression) {
+    case 42: // ...
+    break;
+
+    case 'hello': // ...
+    break;
+
+    case true: // ...
+    break;
+
+    case f(): // ...
+    break;
+
+    default: // ...
+}
+
+for (let i = 0; i < s.length; ++i) {
+    console.log(s[i]);
+}
+
+let node = root;
+while (node.child) {
+    node = node.child;
+}
+
+let password;
+do {
+    password = readPassword();
+} while (password != 'Simsalabim');
+```
 
 ## Exceptions
 
@@ -149,11 +176,11 @@ throw null;
 throw undefined;
 throw true;
 throw 42.0;
-throw "string literal";
+throw 'string literal';
 
-throw new Error("error object");
+throw new Error('error object');
 
-throw {message: "object literal"};
+throw { message: 'object literal' };
 
 throw function() { };
 ```
@@ -169,34 +196,29 @@ const max = function(x, y) {
     return x > y ? x : y;
 }
 
-// var sum = function() { ... }
-function sum() {
-    let result = 0;
-    for (let i = 0; i < arguments.length; ++i) {
-        result += arguments[i];
-    }
-    return result;
+// var average = function() { ... }
+function average(x, y) {
+    return (x + y) / 2;
 }
-
-sum(1, 2, 3)
 ```
 
 * Missing arguments are initialized to `undefined`
 * Extra arguments are ignored
-* All arguments are stored in an array-like `arguments` parameter
 
 ### Higher-order functions
 
 ```js
-function reduce(init, op) {
-    let result = init;
-    for (let i = 2; i < arguments.length; ++i) {
-        result = op(result, arguments[i]);
+function fix(x, f) {
+    let y = f(x);
+    while (y !== x) {
+        console.log(x);
+        x = y;
+        y = f(x);
     }
-    return result;
+    return x;
 }
 
-reduce(1, function(a, b) { return a * b; }, 2, 3, 7)
+fix(0, Math.cos)
 ```
 
 * Functions are first class, hence functions can be:
@@ -220,30 +242,30 @@ increment(99)
   * Even after the enclosing function has returned!
 
 ```js
-const monthName = (function() {
+const monthName = function() {
     // function-local lookup table
-    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
-                        "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+                        'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
     return function(index) {
-        return monthNames[index];
+        return monthNames[index - 1];
     };
-}());
+}();
 ```
 
 ## Objects
 
 ```js
 // object literal
-let inventor = {surname: "Eich", forename: "Brendan"};
+const inventor = { surname: 'Eich', forename: 'Brendan' };
 
 // lookup properties
-let s = inventor["surname"];
-let f = inventor.forname;
+const s = inventor['surname'];
+const f = inventor.forname;
 
 // add properties
-inventor["age"] = 57;
-inventor.language = "JavaScript";
+inventor['age'] = 58;
+inventor.language = 'JavaScript';
 
 // remove property
 delete inventor.forename;
@@ -254,7 +276,63 @@ delete inventor.forename;
 * Properties are accessed via brackets or dot syntax
 * Objects are class-free, properties can be added and removed at will
 
-## Constructor functions and `this`
+### Factory functions
+
+```js
+function makeAccount(initialBalance, accountId) {
+    return {
+        balance: initialBalance,
+        id: accountId,
+
+        deposit: function(amount) {
+            this.balance += amount;
+        },
+
+        getBalance: function() {
+            return this.balance;
+        },
+    };
+}
+
+const a = makeAccount(1000, 123);
+a.deposit(234);
+a.getBalance()
+```
+
+* When a function is invoked via `o.f()` syntax, `this` is bound to `o`
+* When a function is invoked via `f()` syntax, `this` is `undefined`
+
+### Common prototype for methods
+
+```js
+const AccountPrototype = {
+    deposit: function(amount) {
+        this.balance += amount;
+    },
+
+    getBalance: function() {
+        return this.balance;
+    },
+};
+
+function makeAccount(initialBalance, accountId) {
+    return {
+        balance: initialBalance,
+        id: accountId,
+
+        __proto__: AccountPrototype,
+    };
+}
+```
+
+* Property lookup `o.x` starts at the object and goes up the prototype chain:
+  * `o.x`
+  * `o.__proto__.x`
+  * `o.__proto__.__proto__.x`
+  * `o.__proto__.__proto__.__proto__.x`
+  * etc.
+
+### Constructor functions
 
 ```js
 function Account(initialBalance, accountId) {
@@ -263,11 +341,11 @@ function Account(initialBalance, accountId) {
 
     this.deposit = function(amount) {
         this.balance += amount;
-    }
+    };
 
     this.getBalance = function() {
         return this.balance;
-    }
+    };
 }
 
 const a = new Account(1000, 123);
@@ -277,10 +355,8 @@ a.getBalance()
 
 * By convention, functions starting with an uppercase letter are *constructor functions*
 * When a function is invoked via `new F()` syntax, an empty object is created and bound to `this`
-* When a function is invoked via `o.m()` syntax, `this` is bound to `o`
-  * Otherwise, `this` is `undefined` (used to be `window`)
 
-## Prototypes
+### Automatic prototype property
 
 ```js
 function Account(initialBalance, accountId) {
@@ -290,26 +366,20 @@ function Account(initialBalance, accountId) {
 
 Account.prototype.deposit = function(amount) {
     this.balance += amount;
-}
+};
 
 Account.prototype.getBalance() = function() {
     return this.balance;
-}
+};
 ```
+
+* All functions have an automatic `prototype` property
+* Objects created via `new F()` have their `__proto__` property set to `F.prototype`
+  * `F.prototype = { constructor: F };`
 
 ![](img/proto.svg)
 
-* Property lookup `o.x` starts at the object and goes up the prototype chain:
-  * `o.x`
-  * `o.__proto__.x`
-  * `o.__proto__.__proto__.x`
-  * `o.__proto__.__proto__.__proto__.x`
-  * etc.
-* Objects created via `new F()` have their `__proto__` set to `F.prototype`
-  * `F.prototype = {constructor: F};`
-* Moving methods into the prototype saves memory
-
-## The `class` keyword
+### The `class` keyword
 
 ```js
 class Account {
@@ -341,7 +411,7 @@ const primes = [2, 3, 5, 7];
 ```
 
 * JavaScript arrays are JavaScript objects with a special `length` property
-  * `typeof primes === "object"`
+  * `typeof primes === 'object'`
   * The keys are stringified numbers
 * The (mutable!) `length` property is the largest index +1
 * There are no out-of-bounds index errors:
@@ -432,7 +502,7 @@ class Account {
 ```js
 // old school
 Formula.prototype.toString = function() {
-    return this.a + "x² + " + this.b + "x + " + this.c;
+    return this.a + 'x² + ' + this.b + 'x + ' + this.c;
 }
 
 // new school
