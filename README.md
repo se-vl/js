@@ -79,7 +79,7 @@
 
 https://stackoverflow.com/a/23465314
 
-* Type-safe equality via `===` and `!==` (tests type and value)
+* Type-safe equality via `===` and `!==` (compares type and value)
 
 ![](img/eqeqeq.png)
 
@@ -224,6 +224,7 @@ fix(0, Math.cos)
 * Functions are first class, hence functions can be:
   * passed as arguments
   * returned as results
+  * stored in properties
 
 ### Closures
 
@@ -317,10 +318,10 @@ const AccountPrototype = {
 
 function makeAccount(initialBalance, accountId) {
     return {
+        __proto__: AccountPrototype,
+
         balance: initialBalance,
         id: accountId,
-
-        __proto__: AccountPrototype,
     };
 }
 ```
@@ -374,8 +375,8 @@ Account.prototype.getBalance() = function() {
 ```
 
 * All functions have an automatic `prototype` property
-* Objects created via `new F()` have their `__proto__` property set to `F.prototype`
   * `F.prototype = { constructor: F };`
+* Objects created via `new F()` have their `__proto__` property set to `F.prototype`
 
 ![](img/proto.svg)
 
@@ -425,7 +426,7 @@ for (let i = 0; i < primes.length; ++i) {
     console.log(primes[i]);
 }
 
-primes.forEach(function(element, index, array) {
+primes.forEach(function(element, index, array)) {
     console.log(element);
 });
 
@@ -517,10 +518,10 @@ Formula.prototype.toString = function() {
 function solveQuadraticEquation(p, q) {
     const left = -0.5 * p;
     const right = Math.sqrt(left * left - q);
-    return {left, right}; // shorthand for {left: left, right: right}
+    return { left, right }; // shorthand for { left: left, right: right }
 }
 
-let {left, right} = solveQuadraticEquation(1, -2);
+let { left, right } = solveQuadraticEquation(1, -2);
 console.log(`x1 = ${left}
 x2 = ${right}`);
 ```
@@ -532,22 +533,22 @@ x2 = ${right}`);
 JavaScript expert Douglas Crockford discovered that lots of security problems disappear by banning `this`.
 
 ```js
-function createAccount({initialBalance, accountId}) {
+function createAccount({ initialBalance, accountId }) {
     let balance = initialBalance || 0;
     const id = accountId || 0;
 
     const deposit = function(amount) {
         balance += amount;
-    }
+    };
 
     const getBalance = function() {
         return balance;
-    }
+    };
 
-    return Object.freeze({deposit, getBalance});
+    return Object.freeze({ deposit, getBalance });
 }
 
-let a = createAccount({initialBalance: 123, accountId: 1});
+let a = createAccount({ initialBalance: 123, accountId: 1 });
 ```
 
 * Pro: True encapsulation
