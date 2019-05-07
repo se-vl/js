@@ -262,7 +262,7 @@ const inventor = { surname: 'Eich', forename: 'Brendan' };
 
 // lookup properties
 const s = inventor['surname'];
-const f = inventor.forname;
+const f = inventor.forename;
 
 // add properties
 inventor['age'] = 58;
@@ -306,7 +306,7 @@ a.getBalance()
 ### Common prototype for methods
 
 ```js
-const AccountPrototype = {
+const accountMethods = {
     deposit: function(amount) {
         this.balance += amount;
     },
@@ -318,7 +318,7 @@ const AccountPrototype = {
 
 function makeAccount(initialBalance, accountId) {
     return {
-        __proto__: AccountPrototype,
+        __proto__: accountMethods,
 
         balance: initialBalance,
         id: accountId,
